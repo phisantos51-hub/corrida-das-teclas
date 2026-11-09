@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Corrida das Teclas</title>
+  <meta name="description" content="Jogo de digitação para o 1º, 2º e 3º ano: aprenda a usar o teclado correndo com seu carrinho!">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨️</text></svg>">
+  <!-- Ao mudar o estilo ou os scripts, aumente o número depois de "?v=" em todas as linhas. -->
+  <link rel="stylesheet" href="css/estilo.css?v=1">
+</head>
+<body>
+  <div id="app">
+    <header class="barra" id="barra">
+      <button type="button" class="botao-barra" id="btnVoltar" hidden><span aria-hidden="true">⬅️</span> Voltar</button>
+      <p class="marca"><span aria-hidden="true">🏎️</span> Corrida das Teclas</p>
+      <div class="barra-direita">
+        <div class="velocidade" role="group" aria-label="Velocidade">
+          <span class="velocidade-rotulo">Velocidade:</span>
+          <button type="button" class="botao-vel" data-vel="lenta" aria-pressed="true"><span aria-hidden="true">🐢</span> Lenta</button>
+          <button type="button" class="botao-vel" data-vel="media" aria-pressed="false"><span aria-hidden="true">🐇</span> Média</button>
+          <button type="button" class="botao-vel" data-vel="rapida" aria-pressed="false"><span aria-hidden="true">🚀</span> Rápida</button>
+        </div>
+        <button type="button" class="botao-barra" id="btnSom" aria-pressed="false"><span aria-hidden="true">🔇</span> Som: desligado</button>
+        <button type="button" class="botao-barra" id="btnPausa" hidden><span aria-hidden="true">⏸️</span> Pausar</button>
+        <button type="button" class="botao-barra botao-ajuda" id="btnComoJogar"><span aria-hidden="true">❓</span> Como jogar</button>
+      </div>
+    </header>
+
+    <div class="faixa-audio" id="faixaAudio" hidden>
+      <span aria-hidden="true">🎧</span> Modo Áudio ligado. Espaço repete, Esc volta ao menu, F1 desliga.
+    </div>
+
+    <main id="principal">
+      <!-- TELA INICIAL -->
+      <section id="telaInicio" class="tela" aria-labelledby="tituloJogo">
+        <h1 id="tituloJogo" class="titulo-jogo"><span aria-hidden="true">🏎️</span> Corrida das Teclas <span aria-hidden="true">⌨️</span></h1>
+
+        <div class="bloco-audio">
+          <button type="button" class="botao-audio" id="btnAudio">
+            <span aria-hidden="true">🎧</span> Modo Áudio <span class="atalho">(F1)</span>
+          </button>
+          <button type="button" class="botao-pequeno" id="btnVozJogo" aria-pressed="true">Voz do jogo: ligada</button>
+        </div>
+
+        <h2 class="pergunta">1. Escolha o seu ano:</h2>
+        <div class="anos" role="group" aria-label="Ano">
+          <button type="button" class="botao-ano" data-ano="1" aria-pressed="true">1º ano</button>
+          <button type="button" class="botao-ano" data-ano="2" aria-pressed="false">2º ano</button>
+          <button type="button" class="botao-ano" data-ano="3" aria-pressed="false">3º ano</button>
+        </div>
+
+        <h2 class="pergunta">2. Escolha como jogar:</h2>
+        <div class="modos">
+          <button type="button" class="cartao-modo cor-corrida" data-modo="corrida">
+            <span class="icone-modo" aria-hidden="true">🏁</span>
+            <span class="nome-modo">Corrida</span>
+            <span class="frase-modo">Digite certo e o carrinho anda!</span>
+          </button>
+          <button type="button" class="cartao-modo cor-baloes" data-modo="baloes">
+            <span class="icone-modo" aria-hidden="true">🎈</span>
+            <span class="nome-modo">Balões</span>
+            <span class="frase-modo">Estoure os balões digitando o que está neles!</span>
+          </button>
+          <button type="button" class="cartao-modo cor-aula" data-modo="aula">
+            <span class="icone-modo" aria-hidden="true">✋</span>
+            <span class="nome-modo">Aula das mãos</span>
+            <span class="frase-modo">Aprenda onde colocar os dedos no teclado.</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ESCOLHA DE FASE -->
+      <section id="telaFases" class="tela" hidden aria-labelledby="tituloFases">
+        <h1 id="tituloFases" class="titulo-tela"></h1>
+        <p class="subtitulo">Escolha uma fase. Ganhe 2 ou 3 estrelas para liberar a próxima.</p>
+        <ul id="listaFases" class="fases"></ul>
+      </section>
+
+      <!-- JOGO -->
+      <section id="telaJogo" class="tela tela-jogo" hidden role="application" tabindex="-1" aria-label="Corrida das Teclas">
+        <div class="topo-jogo">
+          <p id="infoFase" class="info-fase"></p>
+          <p id="contador" class="contador"></p>
+        </div>
+        <p id="avisoCaps" class="aviso-caps" hidden><span aria-hidden="true">⚠️</span> O Caps Lock está ligado. Aperte a tecla Caps Lock para desligar.</p>
+        <div id="areaJogo" class="area-jogo"></div>
+        <p id="mensagem" class="mensagem" aria-hidden="true"></p>
+        <div id="maos" class="maos" aria-hidden="true"></div>
+        <div id="teclado" class="teclado"></div>
+      </section>
+
+      <!-- MENU DO MODO ÁUDIO -->
+      <section id="telaAudio" class="tela tela-audio" hidden role="application" tabindex="-1" aria-label="Menu do Modo Áudio">
+        <h1 class="titulo-tela"><span aria-hidden="true">🎧</span> Modo Áudio</h1>
+        <p class="subtitulo">Setas para cima e para baixo escolhem. Setas para os lados trocam a fase. Enter começa.</p>
+        <ul id="menuAudio" class="menu-audio"></ul>
+        <p id="avisoVoz" class="aviso-voz" hidden></p>
+      </section>
+    </main>
+
+    <footer class="rodape">
+      <button type="button" class="botao-professor" id="btnProfessor">Área do professor</button>
+    </footer>
+  </div>
+
+  <!-- Região lida pelo NVDA / Narrador quando a voz do jogo está desligada -->
+  <div id="anuncio" class="so-leitor" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- JANELA: COMO JOGAR -->
+  <div class="janela" id="janelaComoJogar" hidden role="dialog" aria-modal="true" aria-labelledby="tituloComoJogar">
+    <div class="caixa caixa-larga">
+      <h2 id="tituloComoJogar"><span aria-hidden="true">❓</span> Como jogar</h2>
+      <ol class="passos-ajuda">
+        <li>
+          <div class="ilustra" aria-hidden="true">
+            <span class="mini-tecla dedo-indicador">F<i></i></span><span class="mini-tecla dedo-indicador">J<i></i></span>
+          </div>
+          <p><strong>Ponha as mãos no lugar.</strong> Os dedos indicadores ficam no <strong>F</strong> e no <strong>J</strong>. Essas teclas têm um <strong>tracinho</strong> que dá para sentir com o dedo.</p>
+        </li>
+        <li>
+          <div class="ilustra" aria-hidden="true">
+            <span class="mini-tecla dedo-medio">D</span><span class="mini-tecla dedo-indicador mini-alvo">F</span><span class="mini-tecla dedo-indicador">G</span>
+          </div>
+          <p><strong>Olhe o teclado da tela.</strong> A tecla que você deve apertar fica <strong>grande e brilhando</strong>.</p>
+        </li>
+        <li>
+          <div class="ilustra" aria-hidden="true">
+            <span class="mini-cor dedo-mindinho">mindinho</span><span class="mini-cor dedo-anelar">anelar</span><span class="mini-cor dedo-medio">médio</span><span class="mini-cor dedo-indicador">indicador</span><span class="mini-cor dedo-polegar">polegar</span>
+          </div>
+          <p><strong>Use o dedo da mesma cor.</strong> Cada cor é um dedo. As mãos desenhadas mostram qual dedo usar.</p>
+        </li>
+        <li>
+          <div class="ilustra ilustra-grande" aria-hidden="true">🚗 💨 · · · · 🏁</div>
+          <p><strong>Corrida:</strong> a cada tecla certa, o carrinho anda. Se errar, ele só para um pouquinho. Tente de novo!</p>
+        </li>
+        <li>
+          <div class="ilustra ilustra-grande" aria-hidden="true">🎈 🎈 💥</div>
+          <p><strong>Balões:</strong> digite o que está escrito no balão marcado para estourá-lo antes que ele voe embora.</p>
+        </li>
+        <li>
+          <div class="ilustra" aria-hidden="true">
+            <span class="mini-tecla mini-larga dedo-mindinho">Shift</span> + <span class="mini-tecla dedo-medio">E</span> = E
+          </div>
+          <p><strong>Letra maiúscula (3º ano):</strong> segure o <strong>Shift</strong> com o mindinho da outra mão e aperte a letra.</p>
+        </li>
+        <li>
+          <div class="ilustra" aria-hidden="true">
+            <span class="mini-tecla dedo-mindinho">´</span> e depois <span class="mini-tecla dedo-mindinho">A</span> = Á
+          </div>
+          <p><strong>Acentos (3º ano):</strong> primeiro aperte o acento, depois a vogal. O <strong>´</strong> fica ao lado do P; o <strong>~</strong> fica ao lado do Ç; o <strong>^</strong> é Shift + ~.</p>
+        </li>
+        <li>
+          <div class="ilustra ilustra-grande" aria-hidden="true">⭐⭐⭐</div>
+          <p><strong>No final</strong>, você ganha até 3 estrelas e vê as teclas que já sabe e as que vale a pena treinar.</p>
+        </li>
+      </ol>
+      <div class="botoes-janela">
+        <button type="button" class="botao-grande" data-fechar>Entendi! <span aria-hidden="true">👍</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JANELA: PAUSA -->
+  <div class="janela" id="janelaPausa" hidden role="dialog" aria-modal="true" aria-labelledby="tituloPausa">
+    <div class="caixa">
+      <h2 id="tituloPausa"><span aria-hidden="true">⏸️</span> Jogo pausado</h2>
+      <p>Descanse um pouquinho. Quando quiser, continue!</p>
+      <div class="botoes-janela">
+        <button type="button" class="botao-grande" id="btnContinuar"><span aria-hidden="true">▶️</span> Continuar</button>
+        <button type="button" class="botao-secundario" id="btnSairPausa"><span aria-hidden="true">🏠</span> Sair da fase</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JANELA: RESULTADO -->
+  <div class="janela" id="janelaResultado" hidden role="dialog" aria-modal="true" aria-labelledby="tituloResultado">
+    <div class="caixa">
+      <h2 id="tituloResultado">Chegada! <span aria-hidden="true">🏁</span></h2>
+      <p id="estrelas" class="estrelas"></p>
+      <p id="resultadoFrase" class="resultado-frase"></p>
+      <p id="resultadoNumeros" class="resultado-numeros"></p>
+      <div class="listas-teclas">
+        <div class="lista-teclas lista-boa">
+          <h3><span aria-hidden="true">🏆</span> Teclas campeãs</h3>
+          <p id="teclasBoas"></p>
+        </div>
+        <div class="lista-teclas lista-treino">
+          <h3><span aria-hidden="true">💪</span> Vamos treinar mais</h3>
+          <p id="teclasTreino"></p>
+        </div>
+      </div>
+      <p id="resultadoExtra" class="resultado-extra"></p>
+      <div class="botoes-janela">
+        <button type="button" class="botao-grande" id="btnProxima"><span aria-hidden="true">➡️</span> Próxima fase</button>
+        <button type="button" class="botao-secundario" id="btnDeNovo"><span aria-hidden="true">🔁</span> Jogar de novo</button>
+        <button type="button" class="botao-secundario" id="btnMenu"><span aria-hidden="true">🏠</span> Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JANELA: ÁREA DO PROFESSOR -->
+  <div class="janela" id="janelaProfessor" hidden role="dialog" aria-modal="true" aria-labelledby="tituloProfessor">
+    <div class="caixa">
+      <h2 id="tituloProfessor">Área do professor</h2>
+      <form id="formSoma" class="form-soma">
+        <label for="respostaSoma" id="perguntaSoma">Quanto é 7 + 8?</label>
+        <input type="text" id="respostaSoma" inputmode="numeric" autocomplete="off" maxlength="3">
+        <button type="submit" class="botao-grande">Entrar</button>
+        <p id="erroSoma" class="erro-soma" role="alert"></p>
+      </form>
+      <div id="opcoesProfessor" hidden>
+        <p id="estadoLiberado" class="estado-professor"></p>
+        <div class="botoes-janela botoes-coluna">
+          <button type="button" class="botao-grande" id="btnLiberar"><span aria-hidden="true">🔓</span> Liberar todas as fases</button>
+          <button type="button" class="botao-perigo" id="btnApagar"><span aria-hidden="true">🗑️</span> Apagar progresso</button>
+        </div>
+        <div id="confirmarApagar" class="confirmar" hidden>
+          <p><strong>Tem certeza?</strong> Isso apaga as estrelas e as fases liberadas <strong>deste computador</strong>.</p>
+          <div class="botoes-janela">
+            <button type="button" class="botao-perigo" id="btnApagarSim">Sim, apagar</button>
+            <button type="button" class="botao-secundario" id="btnApagarNao">Não, cancelar</button>
+          </div>
+        </div>
+        <p id="avisoProfessor" class="aviso-professor" role="status"></p>
+        <p class="dica-professor">Dica: o endereço do jogo terminado em <strong>?audio</strong> abre direto no Modo Áudio, ao apertar qualquer tecla.</p>
+      </div>
+      <div class="botoes-janela">
+        <button type="button" class="botao-secundario" data-fechar>Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/palavras.js?v=1"></script>
+  <script src="js/teclado.js?v=1"></script>
+  <script src="js/som.js?v=1"></script>
+  <script src="js/jogo.js?v=1"></script>
+</body>
+</html>
