@@ -7,7 +7,7 @@
   <meta name="description" content="Jogo de digitação para o 1º, 2º e 3º ano: aprenda a usar o teclado correndo com seu carrinho!">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨️</text></svg>">
   <!-- Ao mudar o estilo ou os scripts, aumente o número depois de "?v=" em todas as linhas. -->
-  <link rel="stylesheet" href="css/estilo.css?v=1">
+  <link rel="stylesheet" href="css/estilo.css?v=2">
 </head>
 <body>
   <div id="app">
@@ -88,6 +88,14 @@
         <p id="mensagem" class="mensagem" aria-hidden="true"></p>
         <div id="maos" class="maos" aria-hidden="true"></div>
         <div id="teclado" class="teclado"></div>
+      </section>
+
+      <!-- MENU DO MODO BRAILLE (dentro do Modo Áudio) -->
+      <section id="telaBraille" class="tela tela-audio" hidden role="application" tabindex="-1" aria-label="Menu do Modo Braille">
+        <h1 class="titulo-tela"><span aria-hidden="true">⠿</span> Modo Braille</h1>
+        <p class="subtitulo">F, D, S = pontos 1, 2, 3 · J, K, L = pontos 4, 5, 6. Setas escolhem, Enter começa, Esc volta.</p>
+        <ul id="menuBraille" class="menu-audio"></ul>
+        <p id="avisoTecladoBraille" class="aviso-voz" hidden></p>
       </section>
 
       <!-- MENU DO MODO ÁUDIO -->
@@ -223,6 +231,16 @@
           </div>
         </div>
         <p id="avisoProfessor" class="aviso-professor" role="status"></p>
+        <fieldset class="professor-braille">
+          <legend>Modo Braille</legend>
+          <label for="nomeBraille">Nome da criança (fase "Meu nome" da Corrida Braille):</label>
+          <div class="linha-nome">
+            <input type="text" id="nomeBraille" maxlength="30" autocomplete="off" spellcheck="false">
+            <button type="button" class="botao-secundario" id="btnSalvarNome">Salvar nome</button>
+          </div>
+          <label class="opcao-cela"><input type="checkbox" id="chkCela"> Mostrar na tela a cela braille de cada letra</label>
+          <p id="avisoBraille" class="aviso-professor" role="status"></p>
+        </fieldset>
         <p class="dica-professor">Dica: o endereço do jogo terminado em <strong>?audio</strong> abre direto no Modo Áudio, ao apertar qualquer tecla.</p>
       </div>
       <div class="botoes-janela">
@@ -231,9 +249,11 @@
     </div>
   </div>
 
-  <script src="js/palavras.js?v=1"></script>
-  <script src="js/teclado.js?v=1"></script>
-  <script src="js/som.js?v=1"></script>
-  <script src="js/jogo.js?v=1"></script>
+  <script src="js/palavras.js?v=2"></script>
+  <script src="js/teclado.js?v=2"></script>
+  <script src="js/som.js?v=2"></script>
+  <script src="js/jogo.js?v=2"></script>
+  <script src="js/braille-tabela.js?v=2"></script>
+  <script src="js/braille.js?v=2"></script>
 </body>
 </html>

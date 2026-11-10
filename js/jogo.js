@@ -285,6 +285,7 @@
     $("areaJogo").textContent = "";
     $("areaJogo").removeAttribute("aria-hidden");
     $("avisoCaps").hidden = true;
+    telaJogo.classList.remove("modo-braille", "ponte-braille");
     mensagem("");
     mostrarTela("jogo");
     telaJogo.focus();
@@ -621,6 +622,10 @@
     $("resultadoNumeros").textContent = r.numeros || "";
     const listas = document.querySelector(".listas-teclas");
     listas.hidden = !r.boas;
+    const tituloBoas = r.tituloBoas || "Teclas campeãs";
+    const tituloTreino = r.tituloTreino || "Vamos treinar mais";
+    document.querySelector(".lista-boa h3").innerHTML = '<span aria-hidden="true">🏆</span> ' + tituloBoas;
+    document.querySelector(".lista-treino h3").innerHTML = '<span aria-hidden="true">💪</span> ' + tituloTreino;
     if (r.boas) {
       chips($("teclasBoas"), r.boas, "Continue treinando!");
       chips($("teclasTreino"), r.treino, "Você não errou nenhuma tecla! 🎉");
@@ -632,8 +637,8 @@
     abrirJanela("janelaResultado", r.proxima ? "btnProxima" : r.deNovo ? "btnDeNovo" : "btnMenu");
     if (estado.audio) {
       let fala = r.titulo.replace(/[^\p{L}\p{N}!.,: ]/gu, "") + " Você ganhou " + r.estrelas + (r.estrelas === 1 ? " estrela. " : " estrelas. ") + (r.frase || FRASES_ESTRELAS[r.estrelas]) + " ";
-      if (r.boas && r.boas.length) fala += "Teclas campeãs: " + nomesFalados(r.boas) + ". ";
-      if (r.treino && r.treino.length) fala += "Vamos treinar mais: " + nomesFalados(r.treino) + ". ";
+      if (r.boas && r.boas.length) fala += tituloBoas + ": " + nomesFalados(r.boas) + ". ";
+      if (r.treino && r.treino.length) fala += tituloTreino + ": " + nomesFalados(r.treino) + ". ";
       if (r.extra && /liberada/.test(r.extra)) fala += "Nova fase liberada! ";
       const opcoes = r.proxima ? "Aperte Enter para a próxima fase, ou Esc para voltar ao menu."
         : r.deNovo ? "Aperte Enter para jogar de novo, ou Esc para voltar ao menu." : "Aperte Enter ou Esc para voltar ao menu.";
@@ -810,7 +815,7 @@
   }
 
   /* ================= TELAS ================= */
-  const TELAS = { inicio: "telaInicio", fases: "telaFases", jogo: "telaJogo", audio: "telaAudio" };
+  const TELAS = { inicio: "telaInicio", fases: "telaFases", jogo: "telaJogo", audio: "telaAudio", braille: "telaBraille" };
   function mostrarTela(nome) {
     Object.keys(TELAS).forEach(function (k) { $(TELAS[k]).hidden = k !== nome; });
     estado.tela = nome;
@@ -881,6 +886,12 @@
   }
 
   function voltar() {
+    // Atividades do Modo Braille voltam para o menu do Modo Braille.
+    if (estado.jogo && estado.jogo.aoVoltar) {
+      const aoVoltar = estado.jogo.aoVoltar;
+      pararJogo(); fecharJanela(true); aoVoltar(); return;
+    }
+    if (estado.tela === "braille") { abrirMenuAudio(); return; }
     if (estado.audio) {
       if (estado.tela === "audio") { abrirMenuAudio(); return; }
       pararJogo(); fecharJanela(true); abrirMenuAudio(); return;
@@ -1030,6 +1041,7 @@
     return [
       { id: "corrida", texto: "Corrida, fase " + (estado.menuAudio.fase + 1) + ": " + fase.nome, ajuda: "Use as setas para os lados para trocar de fase." },
       { id: "ditado", texto: "Ditado: eu falo uma palavra e você escreve" },
+      { id: "braille", texto: "Modo Braille: escrever com as teclas F, D, S, J, K e L" },
       { id: "aula", texto: "Aula das mãos: encontrar as teclas com tracinho" },
       { id: "voz", texto: progresso.vozJogo ? "Voz do jogo: ligada. Enter desliga, para usar o NVDA" : "Voz do jogo: desligada. Enter liga" },
       { id: "sair", texto: "Sair do Modo Áudio" }
@@ -1065,6 +1077,7 @@
     const item = itensMenuAudio()[estado.menuAudio.indice];
     if (item.id === "corrida") iniciarCorrida(1, estado.menuAudio.fase);
     else if (item.id === "ditado") iniciarDitado();
+    else if (item.id === "braille") { if (typeof BRAILLE !== "undefined") BRAILLE.abrir(); }
     else if (item.id === "aula") iniciarAula();
     else if (item.id === "voz") {
       alternarVozJogo();
@@ -1146,9 +1159,9 @@
     $("btnApagar").focus();
   });
   $("btnApagarSim").addEventListener("click", function () {
-    const voz = progresso.vozJogo;
+    const guardar = { vozJogo: progresso.vozJogo, brailleNome: progresso.brailleNome, mostrarCela: progresso.mostrarCela };
     progresso = padrao();
-    progresso.vozJogo = voz;
+    Object.assign(progresso, guardar);
     salvar();
     estado.ano = 1;
     $("confirmarApagar").hidden = true;
@@ -1195,6 +1208,7 @@
       return;
     }
     if (estado.tela === "audio") { teclaMenuAudio(e); return; }
+    if (estado.tela === "braille") { if (typeof BRAILLE !== "undefined") BRAILLE.teclaMenu(e); return; }
     if (estado.tela === "jogo" && estado.jogo && estado.jogo.tecla) {
       // Enter e espaço num botão da barra (acessado com Tab) continuam funcionando como botão.
       const t = e.target;
@@ -1207,7 +1221,13 @@
   });
   // Evita que o espaço "aperte" um botão em foco quando o jogo usa a tecla.
   document.addEventListener("keyup", function (e) {
-    if (e.key === " " && (estado.tela === "jogo" || estado.tela === "audio" || (estado.audio && estado.janela === "janelaResultado"))) {
+    // Modo Braille: a letra é registrada quando todas as teclas são soltas.
+    if (estado.tela === "jogo" && estado.jogo && estado.jogo.teclaSolta && !estado.janela) {
+      e.preventDefault();
+      estado.jogo.teclaSolta(e);
+      return;
+    }
+    if (e.key === " " && (estado.tela === "jogo" || estado.tela === "audio" || estado.tela === "braille" || (estado.audio && estado.janela === "janelaResultado"))) {
       const t = e.target;
       if (!(t && t.tagName === "BUTTON" && estado.tela === "jogo" && !estado.audio)) e.preventDefault();
     }
@@ -1231,6 +1251,18 @@
       abrirJanela("janelaPausa", "btnContinuar");
     }
   });
+
+  /* ================= LIGAÇÃO COM O MODO BRAILLE (js/braille.js) ================= */
+  window.CORRIDA = {
+    estado: estado,
+    progresso: function () { return progresso; },
+    salvar: salvar, el: el, sortear: sortear, aleatorio: aleatorio, tocar: tocar, mensagem: mensagem,
+    prepararTelaJogo: prepararTelaJogo, pararJogo: pararJogo, mostrarTela: mostrarTela,
+    mostrarResultado: mostrarResultado, abrirMenuAudio: abrirMenuAudio, svgCarro: svgCarro,
+    novasEstatisticas: novasEstatisticas, registrar: registrar, analisar: analisar,
+    estrelasPorPrecisao: estrelasPorPrecisao, ELOGIOS: ELOGIOS,
+    destacar: function (passo) { TECLADO.destacar(tecladoEl, maosEl, passo); }
+  };
 
   /* ================= INÍCIO ================= */
   VOZ.usarVozPropria(progresso.vozJogo);

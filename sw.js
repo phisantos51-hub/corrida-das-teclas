@@ -3,15 +3,17 @@
   Com internet, sempre busca a versão mais nova; sem internet, usa a cópia guardada.
   Se acrescentar arquivos novos ao jogo, inclua-os na lista ARQUIVOS e aumente a VERSAO.
 */
-const VERSAO = "corrida-das-teclas-1";
+const VERSAO = "corrida-das-teclas-2";
 const ARQUIVOS = [
   "./",
   "index.html",
-  "css/estilo.css?v=1",
-  "js/palavras.js?v=1",
-  "js/teclado.js?v=1",
-  "js/som.js?v=1",
-  "js/jogo.js?v=1"
+  "css/estilo.css?v=2",
+  "js/palavras.js?v=2",
+  "js/teclado.js?v=2",
+  "js/som.js?v=2",
+  "js/jogo.js?v=2",
+  "js/braille-tabela.js?v=2",
+  "js/braille.js?v=2"
 ];
 
 self.addEventListener("install", function (e) {

@@ -28,6 +28,22 @@ Endereço: https://phisantos51-hub.github.io/corrida-das-teclas/
 - O endereço terminado em `?audio` (https://phisantos51-hub.github.io/corrida-das-teclas/?audio) abre o jogo pronto para o Modo Áudio: basta apertar qualquer tecla.
 - A voz usa as vozes instaladas no computador. No Windows, confira se a voz "Português (Brasil)" está instalada (Configurações > Hora e idioma > Fala).
 
+## Modo Braille (dentro do Modo Áudio)
+
+Para estudante cego que já tem noções de braille. No menu do Modo Áudio, escolha **Modo Braille**.
+
+- As teclas viram os pontos da cela, como na máquina Perkins:
+  F = ponto 1, D = ponto 2, S = ponto 3, J = ponto 4, K = ponto 5, L = ponto 6.
+- A criança aperta as teclas juntas; a letra é registrada quando ela solta todas.
+- Barra de espaço: espaço entre palavras (quando não é hora de espaço, repete a instrução). Backspace: apaga. Esc: volta ao menu.
+- Na primeira vez, o jogo testa o teclado ("aperte as seis teclas juntas"). Se o teclado não registrar todas,
+  avisa por voz e mostra o aviso no menu do Modo Braille.
+- Atividades: Apresentação dos pontos, Corrida Braille (A a J, K a T, U a Z, palavras curtas, nome da criança,
+  Ç e letras com acento), Ponte (o jogo fala os pontos e a criança digita a letra no teclado comum) e Treino livre.
+- Na Área do professor: cadastrar o nome da criança e mostrar na tela a cela braille de cada letra.
+- A tabela de pontos fica em `js/braille-tabela.js`; a lista para conferir está em `REVISAR-BRAILLE.md`.
+- As palavras curtas ficam no fim de `js/palavras.js` (lista `PALAVRAS_BRAILLE`).
+
 ## Área do professor
 
 Botão discreto "Área do professor", no canto de baixo da tela inicial, protegido por uma conta de somar.
@@ -41,6 +57,7 @@ O progresso fica salvo só no navegador daquele computador.
 - `js/teclado.js`: o desenho do teclado ABNT2, os dedos e as dicas.
 - `js/som.js`: a voz e os bipes.
 - `js/jogo.js`: o funcionamento do jogo.
+- `js/braille.js` e `js/braille-tabela.js`: o Modo Braille e a sua tabela de pontos.
 - `css/estilo.css`: cores e tamanhos.
 - `sw.js`: guarda uma cópia para o jogo abrir sem internet.
 

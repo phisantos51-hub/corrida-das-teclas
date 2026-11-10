@@ -215,3 +215,12 @@ const ANOS = [
 */
 const DITADO = ["SOL", "PATO", "BOLA", "CASA", "LUA", "MAR", "GATO", "DADO", "UVA",
                 "OVO", "RUA", "MALA", "SAPO", "BOLO", "CAMA", "MESA", "PIPA", "VACA"];
+
+/*
+  PALAVRAS DO MODO BRAILLE (fase "Palavras curtas" da Corrida Braille)
+  A criança forma cada letra com as teclas F, D, S, J, K e L.
+  Use palavras curtas, em letras maiúsculas, sem acento.
+  O nome da criança é cadastrado na Área do professor, não aqui.
+*/
+const PALAVRAS_BRAILLE = ["SOL", "PATO", "BOLA", "CASA", "LUA", "MAR", "GATO", "DADO", "UVA",
+                          "OVO", "RUA", "MALA", "SAPO", "BOLO", "CAMA", "MESA", "PIPA", "VACA"];
